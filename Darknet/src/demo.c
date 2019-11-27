@@ -11,12 +11,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
 //SECTION code is added -->
-
-//temp human
-//int   target_class_a = -1;
-int   target_class_a = 67;
+FILE *fp;
+FILE *fp1;
+int target_class_a = 0;
 
 
 #define DEMO 1
@@ -132,21 +130,21 @@ void *detect_in_thread(void *ptr)
 
             if(target_xval > 0.6){
                 printf("r\n");
-                system("sudo echo 0 > /sys/class/gpio/gpio398/value");
-                system("sudo echo 1 > /sys/class/gpio/gpio396/value");
+                fprintf(fp, "%d\n", 0);
+                fprintf(fp1, "%d\n", 1);
             }else if(target_xval < 0.4){
                 printf("l\n");
-                system("sudo echo 1 > /sys/class/gpio/gpio398/value");
-                system("sudo echo 0 > /sys/class/gpio/gpio396/value");
+                fprintf(fp, "%d\n", 1);
+                fprintf(fp1, "%d\n", 0);
             }else{
                 printf("s\n");
-                system("sudo echo 1 > /sys/class/gpio/gpio398/value");
-                system("sudo echo 1 > /sys/class/gpio/gpio396/value");
+                fprintf(fp, "%d\n", 1);
+                fprintf(fp1, "%d\n", 1);
             }
         }else {
             printf("i\n");
-            system("sudo echo 0 > /sys/class/gpio/gpio398/value");
-            system("sudo echo 0 > /sys/class/gpio/gpio396/value");
+            fprintf(fp, "%d\n", 0);
+            fprintf(fp1, "%d\n", 0);
         }
     }
     #endif
@@ -207,12 +205,41 @@ void *detect_loop(void *ptr)
     }
 }
 
+
+#define SYS_GPIO_DIR "/sys/class/gpio"
+
+
+
 void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const char *filename, char **names, int classes, int delay, char *prefix, int avg_frames, float hier, int w, int h, int frames, int fullscreen)
 {
-    system("sudo echo 398 > /sys/class/gpio/export");
-    system("sudo echo 396 > /sys/class/gpio/export");
-    system("sudo echo out > /sys/class/gpio/gpio398/direction");
-    system("sudo echo out > /sys/class/gpio/gpio396/direction");
+    int port_num = 398;
+    int port_num1 = 396;
+    char buff01[256];
+
+    snprintf(buff01, sizeof(buff01), "/sys/class/gpio/export");
+    fp = fopen(buff01, "w");
+    fprintf(fp, "396\n398\n");
+    fclose(fp);
+    
+    snprintf(buff01, sizeof(buff01), "%s/gpio%d/direction", SYS_GPIO_DIR, port_num);
+    fp = fopen(buff01, "w");
+    fprintf(fp, "out\n");
+    fclose(fp);
+    
+    snprintf(buff01, sizeof(buff01), "%s/gpio%d/direction", SYS_GPIO_DIR, port_num1);
+    fp = fopen(buff01, "w");
+    fprintf(fp, "out\n");
+    fclose(fp);
+    
+    snprintf(buff01, sizeof(buff01), "%s/gpio%d/value", SYS_GPIO_DIR, port_num);
+    fp = fopen(buff01, "w");
+    setvbuf(fp, NULL, _IONBF, 0);
+    
+    snprintf(buff01, sizeof(buff01), "%s/gpio%d/value", SYS_GPIO_DIR, port_num1);
+    fp1 = fopen(buff01, "w");
+    setvbuf(fp1, NULL, _IONBF, 0);
+    
+    
     //demo_frame = avg_frames;
     image **alphabet = load_alphabet();
     demo_names = names;
@@ -276,4 +303,11 @@ void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const ch
         pthread_join(detect_thread, 0);
         ++count;
     }
+    fclose(fp);
+    fclose(fp1);
+    
+    snprintf(buff01, sizeof(buff01), "%s/unexport", SYS_GPIO_DIR);
+    fp = fopen(buff01, "w");
+    fprintf(fp, "396\n398\n");
+    fclose(fp);
 }

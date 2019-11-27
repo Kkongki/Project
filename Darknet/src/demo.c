@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
 //SECTION code is added -->
 
 //temp human

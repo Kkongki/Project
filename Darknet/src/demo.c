@@ -15,7 +15,7 @@
 
 //temp human
 //int   target_class_a = -1;
-int   target_class_a = 67;
+int   target_class_a = 0;
 
 
 #define DEMO 1

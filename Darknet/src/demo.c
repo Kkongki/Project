@@ -8,20 +8,14 @@
 #include "image.h"
 #include "demo.h"
 #include <sys/time.h>
-
+//SECTION code is added -->
 #include <stdio.h>
 #include <stdlib.h>
-//SECTION code is added -->
 
-//temp human
-//int   target_class_a = -1;
-int   target_class_a = 0;
-
-
+int target_class_a = 0;
+//SECTION code is added <--
 #define DEMO 1
 
-//#ifdef OPENCV
-int ps = 1;
 static char **demo_names;
 static image **demo_alphabet;
 static int demo_classes;
@@ -44,7 +38,6 @@ static int demo_done = 0;
 static int demo_total = 0;
 double demo_time;
 
-void sig_handler(int signo);
 detection *get_network_boxes(network *net, int w, int h, float thresh, float hier, int *map, int relative, int *num);
 
 int size_network(network *net)
@@ -102,7 +95,6 @@ void *detect_in_thread(void *ptr)
     float target_wval = .0f;
     float target_hval = .0f;
     float distance_val = .0f;
-
     //code is added <--
 
     layer l = net->layers[net->n-1];
@@ -124,33 +116,30 @@ void *detect_in_thread(void *ptr)
     #if 0
         draw_detections(display, dets, nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes);
     #else
-    if(ps == 1) {
-        if(draw_detections(display, dets, nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, target_class_a, &target_xval, &target_wval, &target_hval)) {
-            distance_val = target_wval*target_hval;
-            printf("[demo.c] target class(%d), xval = %f, wval = %f, hval = %f distance_val = %f \n", target_class_a, target_xval, target_wval, target_hval, distance_val);
+    if(draw_detections(display, dets, nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, target_class_a, &target_xval, &target_wval, &target_hval)) {
+        distance_val = target_wval*target_hval;
+        printf("[demo.c] target class(%d), xval = %f, wval = %f, hval = %f distance_val = %f \n", target_class_a, target_xval, target_wval, target_hval, distance_val);
 
-            if(target_xval > 0.6){
-                printf("r\n");
-                system("sudo echo 0 > /sys/class/gpio/gpio398/value");
-                system("sudo echo 1 > /sys/class/gpio/gpio396/value");
-            }else if(target_xval < 0.4){
-                printf("l\n");
-                system("sudo echo 1 > /sys/class/gpio/gpio398/value");
-                system("sudo echo 0 > /sys/class/gpio/gpio396/value");
-            }else{
-                printf("s\n");
-                system("sudo echo 1 > /sys/class/gpio/gpio398/value");
-                system("sudo echo 1 > /sys/class/gpio/gpio396/value");
-            }
-        }else {
-            printf("i\n");
-            system("sudo echo 0 > /sys/class/gpio/gpio398/value");
+        if(target_xval > 0.6){
+            printf("r\n");
+            system("sudo echo 0 > /sys/class/gpio/gpio298/value");
+            system("sudo echo 1 > /sys/class/gpio/gpio396/value");
+        }else if(target_xval < 0.4){
+            printf("l\n");
+            system("sudo echo 1 > /sys/class/gpio/gpio298/value");
             system("sudo echo 0 > /sys/class/gpio/gpio396/value");
+        }else{
+            printf("s\n");
+            system("sudo echo 1 > /sys/class/gpio/gpio298/value");
+            system("sudo echo 1 > /sys/class/gpio/gpio396/value");
         }
+    }else {
+        printf("i\n");
+        system("sudo echo 0 > /sys/class/gpio/gpio298/value");
+        system("sudo echo 0 > /sys/class/gpio/gpio396/value");
     }
     #endif
     //!SECTION code is added <--
-
 
     free_detections(dets, nboxes);
 
@@ -208,10 +197,12 @@ void *detect_loop(void *ptr)
 
 void demo(char *cfgfile, char *weightfile, float thresh, int cam_index, const char *filename, char **names, int classes, int delay, char *prefix, int avg_frames, float hier, int w, int h, int frames, int fullscreen)
 {
-    system("sudo echo 398 > /sys/class/gpio/export");
+	//SECTION code is added -->
+    system("sudo echo 298 > /sys/class/gpio/export");
     system("sudo echo 396 > /sys/class/gpio/export");
-    system("sudo echo out > /sys/class/gpio/gpio398/direction");
+    system("sudo echo out > /sys/class/gpio/gpio298/direction");
     system("sudo echo out > /sys/class/gpio/gpio396/direction");
+	//SECTION code is added <--
     //demo_frame = avg_frames;
     image **alphabet = load_alphabet();
     demo_names = names;

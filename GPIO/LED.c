@@ -42,29 +42,32 @@ int main( int argc, char **argv )
             break;  
 
         case '5':
-            for(int i = 0; i < 10; i++) {
+            for(int i = 0; i < 5; i++) {
                 system("sudo echo 1 > /sys/class/gpio/gpio298/value");
-                sleep(0.5);
+                sleep(1);
                 system("sudo echo 0 > /sys/class/gpio/gpio298/value");
-                sleep(0.5
+                sleep(1);
+            }
             break;  
 
         case '6':
-            for(int i = 0; i < 10; i++) {
+            for(int i = 0; i < 5; i++) {
                 system("sudo echo 1 > /sys/class/gpio/gpio396/value");
-                sleep(0.5);
+                sleep(1);
                 system("sudo echo 0 > /sys/class/gpio/gpio396/value");
-                sleep(0.5
+                sleep(1);
+            }
             break;  
 
         case '7':
-            for(int i = 0; i < 10; i++) {
+            for(int i = 0; i < 5; i++) {
                 system("sudo echo 1 > /sys/class/gpio/gpio396/value");
                 system("sudo echo 0 > /sys/class/gpio/gpio298/value");
-                sleep(0.5);
+                sleep(1);
                 system("sudo echo 0 > /sys/class/gpio/gpio396/value");
                 system("sudo echo 1 > /sys/class/gpio/gpio298/value");
-                sleep(0.5
+                sleep(1);
+            }
             break;
             
         case 'q':

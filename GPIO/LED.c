@@ -6,6 +6,7 @@ int main_menu(void);
 
 int main( int argc, char **argv )
 {
+    int key:
     system("sudo echo 298 > /sys/class/gpio/export");
     system("sudo echo 396 > /sys/class/gpio/export");
     system("sudo echo out > /sys/class/gpio/gpio298/direction");
